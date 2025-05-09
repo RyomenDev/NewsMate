@@ -58,8 +58,8 @@ app.use(express.json());
 app.use(express.static("public"));
 app.use(cookieParser());
 
-import Routes from "./routes/index.js";
-app.use("/api", Routes);
+// import Routes from "./routes/index.js";
+// app.use("/api", Routes);
 
 app.post("/testing", (req, res) => {
   console.log("Testing");

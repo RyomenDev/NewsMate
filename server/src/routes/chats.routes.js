@@ -1,14 +1,16 @@
 import express from "express";
 import {
-  GetFilteredContacts,
-  GetLocationFilters,
-//   GetLocationLevels,
-} from "../controllers/contact.controller.js";
+  createSession,
+  sendMessage,
+  getHistory,
+  resetSession,
+} from "../controllers/chat.controller.js";
 
 const router = express.Router();
 
-router.get("/filters", GetLocationFilters);
-router.get("/filteredContacts", GetFilteredContacts);
-// router.get("/filters/levels", GetLocationLevels);
+router.get("/session", createSession); // Generate new session ID
+router.post("/chat", sendMessage); // Send message to bot
+router.get("/history/:sessionId", getHistory); // Fetch chat history
+router.post("/reset", resetSession); // Reset chat session
 
 export default router;

@@ -1,16 +1,19 @@
-import { redisClient } from "../services/redisClient.js"; // updated path & import
+import redisClient from "../services/redisClient.js"; // updated path & import
 import { v4 as uuidv4 } from "uuid";
 import { getBotResponse } from "../services/gemini.service.js";
 
 // GET /session — Generate new session ID
 export const createSession = (req, res) => {
-  const sessionId = uuidv4();
-  res.status(200).json({ sessionId });
+  console.log("createSession");
+
+  //   const sessionId = uuidv4();
+  //   res.status(200).json({ sessionId });
 };
 
 // POST /chat — Handle user message and get bot response
 export const sendMessage = async (req, res) => {
   const { message, sessionId } = req.body;
+  console.log("SendMessage", message);
 
   if (!message || !sessionId) {
     return res
@@ -37,6 +40,7 @@ export const sendMessage = async (req, res) => {
 // GET /history/:sessionId — Retrieve chat history
 export const getHistory = async (req, res) => {
   const { sessionId } = req.params;
+  console.log("Get History", sessionId);
   const sessionKey = `session:${sessionId}`;
 
   try {
@@ -51,6 +55,8 @@ export const getHistory = async (req, res) => {
 
 // POST /reset — Clear session
 export const resetSession = async (req, res) => {
+  console.log("Reset Session");
+
   const { sessionId } = req.body;
   const sessionKey = `session:${sessionId}`;
 

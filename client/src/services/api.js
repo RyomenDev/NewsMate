@@ -5,7 +5,10 @@ import { toast } from "@/components/ui/sonner";
 const DEFAULT_SESSION_ID = "default-session";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000",
+  baseURL: import.meta.env.VITE_API_URL
+    ? `${import.meta.env.VITE_API_URL}/api`
+    : "http://localhost:3000/api",
+
   timeout: 15000,
   headers: {
     "Content-Type": "application/json",
@@ -26,7 +29,10 @@ api.interceptors.response.use(
 export const chatApi = {
   fetchHistory: async (sessionId = DEFAULT_SESSION_ID) => {
     try {
+      //   console.log("fetching History");
       const response = await api.get(`/history/${sessionId}`);
+      //   console.log("History", response.data);
+
       return response.data;
     } catch (error) {
       console.error("Error fetching chat history:", error);
@@ -36,7 +42,10 @@ export const chatApi = {
 
   sendMessage: async (message, sessionId = DEFAULT_SESSION_ID) => {
     try {
+      //   console.log("sending Message", message);
       const response = await api.post("/chat", { message, sessionId });
+      //   console.log("response", response.data);
+
       return response.data;
     } catch (error) {
       console.error("Error sending message:", error);
@@ -46,6 +55,7 @@ export const chatApi = {
 
   resetSession: async (sessionId = DEFAULT_SESSION_ID) => {
     try {
+      console.log("resetSession");
       const response = await api.post("/reset", { sessionId });
       return response.data;
     } catch (error) {

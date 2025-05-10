@@ -1,20 +1,19 @@
-
-import { useEffect, useRef, useState } from 'react';
-import { toast } from 'sonner';
-import ChatMessage from './ChatMessage';
-import TypingIndicator from './TypingIndicator';
-import { chatApi } from '@/services/api';
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import ChatMessage from "./ChatMessage";
+import TypingIndicator from "./TypingIndicator";
+import { chatApi } from "@/services/api";
 
 const ChatContainer = () => {
   const [messages, setMessages] = useState([]);
-  const [inputMessage, setInputMessage] = useState('');
+  const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [sessionId, setSessionId] = useState('default-session');
+  const [sessionId, setSessionId] = useState("default-session");
   const messagesEndRef = useRef(null);
 
   // Scroll to the bottom of the messages
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   // Load chat history on component mount
@@ -23,12 +22,27 @@ const ChatContainer = () => {
       setIsLoading(true);
       try {
         const history = await chatApi.fetchHistory(sessionId);
+        // if (history && Array.isArray(history)) {
+        //   setMessages(history);
+        // }
         if (history && Array.isArray(history)) {
-          setMessages(history);
+          const normalized = history.flatMap((entry, i) => [
+            {
+              id: `${i}-user`,
+              text: entry.user,
+              sender: "user",
+            },
+            {
+              id: `${i}-bot`,
+              text: entry.bot,
+              sender: "bot",
+            },
+          ]);
+          setMessages(normalized);
         }
       } catch (error) {
-        console.error('Failed to load chat history', error);
-        toast.error('Failed to load chat history');
+        console.error("Failed to load chat history", error);
+        toast.error("Failed to load chat history");
       } finally {
         setIsLoading(false);
       }
@@ -39,42 +53,45 @@ const ChatContainer = () => {
 
   // Scroll to bottom whenever messages change
   useEffect(() => {
+    // console.log("Updated messages:", messages);
     scrollToBottom();
   }, [messages]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    
+
     if (!inputMessage.trim()) return;
-    
+
     // Add user message to chat
     const userMessage = {
       id: Date.now().toString(),
       text: inputMessage,
-      sender: 'user',
-      timestamp: new Date().toISOString()
+      sender: "user",
+      timestamp: new Date().toISOString(),
     };
-    
-    setMessages(prev => [...prev, userMessage]);
-    setInputMessage('');
+
+    setMessages((prev) => [...prev, userMessage]);
+    setInputMessage("");
     setIsLoading(true);
-    
+
     try {
       // Send message to API
       const response = await chatApi.sendMessage(inputMessage, sessionId);
-      
+      console.log("Response:::", response.response);
+
       // Add bot response to chat
-      if (response && response.text) {
+      if (response && response.response) {
         const botMessage = {
           id: (Date.now() + 1).toString(),
-          text: response.text,
-          sender: 'bot',
-          timestamp: new Date().toISOString()
+          text: response.response,
+          sender: "bot",
+          timestamp: new Date().toISOString(),
         };
-        setMessages(prev => [...prev, botMessage]);
+        setMessages((prev) => [...prev, botMessage]);
       }
+
     } catch (error) {
-      console.error('Failed to send message', error);
+      console.error("Failed to send message", error);
     } finally {
       setIsLoading(false);
     }
@@ -85,9 +102,9 @@ const ChatContainer = () => {
       setIsLoading(true);
       await chatApi.resetSession(sessionId);
       setMessages([]);
-      toast.success('Chat session reset successfully');
+      toast.success("Chat session reset successfully");
     } catch (error) {
-      console.error('Failed to reset session', error);
+      console.error("Failed to reset session", error);
     } finally {
       setIsLoading(false);
     }
@@ -116,11 +133,18 @@ const ChatContainer = () => {
             <p>No messages yet. Start the conversation!</p>
           </div>
         ) : (
-          messages.map((message) => (
-            <ChatMessage 
-              key={message.id} 
-              message={message} 
-              isUser={message.sender === 'user'} 
+          //   messages.map((message) => (
+          //     <ChatMessage
+          //       key={message.id}
+          //       message={message}
+          //       isUser={message.sender === 'user'}
+          //     />
+          //   ))
+          messages.map((message, index) => (
+            <ChatMessage
+              key={message.id || index}
+              message={message}
+              isUser={message.sender === "user"}
             />
           ))
         )}
@@ -129,7 +153,7 @@ const ChatContainer = () => {
       </div>
 
       {/* Message Input Area */}
-      <form 
+      <form
         onSubmit={handleSendMessage}
         className="flex items-center p-4 bg-white border-t border-gray-200"
       >
@@ -146,9 +170,11 @@ const ChatContainer = () => {
           disabled={!inputMessage.trim() || isLoading}
           className={`
             bg-newsmate-blue text-white px-4 py-2 rounded-r-lg
-            ${(!inputMessage.trim() || isLoading) 
-              ? 'opacity-50 cursor-not-allowed' 
-              : 'hover:bg-opacity-90'}
+            ${
+              !inputMessage.trim() || isLoading
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-opacity-90"
+            }
           `}
         >
           Send

@@ -1,15 +1,10 @@
 import axios from "axios";
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY; // Make sure to set this in your .env file
-const GEMINI_API_URL =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-/**
- * Send a prompt to the Gemini API and get a response.
- * @param {string} userPrompt - User's input query.
- * @param {string[]} contextChunks - Retrieved context passages from vector store (optional).
- * @returns {string} Gemini's generated answer.
- */
+const GEMINI_API_URL =
+  "https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent";
+
 export const getBotResponse = async (userPrompt, contextChunks = []) => {
   try {
     const contextText = contextChunks.length
@@ -19,12 +14,14 @@ export const getBotResponse = async (userPrompt, contextChunks = []) => {
       : "";
 
     const prompt = `${contextText}\n\nQuestion: ${userPrompt}`;
+    console.log(prompt);
 
     const response = await axios.post(
       `${GEMINI_API_URL}?key=${GEMINI_API_KEY}`,
       {
         contents: [
           {
+            role: "user",
             parts: [{ text: prompt }],
           },
         ],
@@ -36,7 +33,10 @@ export const getBotResponse = async (userPrompt, contextChunks = []) => {
       }
     );
 
+    // console.log(response.data.candidates[0].content);
+
     const answer = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    // console.log(answer);
 
     return answer || "I'm not sure how to answer that.";
   } catch (error) {

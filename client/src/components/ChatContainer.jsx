@@ -16,6 +16,28 @@ const ChatContainer = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (isLoading) {
+        toast.error("Response is taking longer than usual.");
+      }
+    }, 10000); // 10 seconds timeout for response
+
+    return () => clearTimeout(timer);
+  }, [isLoading]);
+
+  useEffect(() => {
+    if (messages.length === 0) {
+      const welcomeMessage = {
+        id: "welcome",
+        text: "Welcome to NewsMate! How can I assist you today?",
+        sender: "bot",
+        timestamp: new Date().toISOString(),
+      };
+      setMessages([welcomeMessage]);
+    }
+  }, [messages]);
+
   // Load chat history on component mount
   useEffect(() => {
     const loadHistory = async () => {
@@ -89,7 +111,6 @@ const ChatContainer = () => {
         };
         setMessages((prev) => [...prev, botMessage]);
       }
-
     } catch (error) {
       console.error("Failed to send message", error);
     } finally {

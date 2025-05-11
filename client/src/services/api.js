@@ -55,7 +55,7 @@ export const chatApi = {
 
   resetSession: async (sessionId = DEFAULT_SESSION_ID) => {
     try {
-    //   console.log("resetSession");
+      //   console.log("resetSession");
       const response = await api.post("/reset", { sessionId });
       return response.data;
     } catch (error) {

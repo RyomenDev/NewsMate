@@ -99,7 +99,7 @@ const ChatContainer = () => {
     try {
       // Send message to API
       const response = await chatApi.sendMessage(inputMessage, sessionId);
-      console.log("Response:::", response.response);
+    //   console.log("Response:::", response.response);
 
       // Add bot response to chat
       if (response && response.response) {

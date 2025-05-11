@@ -1,5 +1,5 @@
 # 🧠 NewsMate: A RAG-Based News Chatbot
-
+![Image](https://github.com/user-attachments/assets/379ef838-ab02-40c4-a15f-97a7425f2bcd)
 ## 📌 Objective
 
 NewsMate is an intelligent chatbot that provides real-time, conversational answers based on the latest news articles. It leverages Retrieval-Augmented Generation (RAG) to ground LLM responses in fresh, factual news content sourced from RSS feeds.

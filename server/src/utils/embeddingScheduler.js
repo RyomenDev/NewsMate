@@ -2,7 +2,7 @@ import Bottleneck from "bottleneck";
 import { generateEmbeddings } from "./xenovaEmbedding.js";
 
 const INTERVAL_MS = parseInt(
-  process.env.EMBED_REFRESH_INTERVAL_MS || "300000",
+  process.env.EMBED_REFRESH_INTERVAL_MS || "43200000", // 12 hrs
   10
 );
 

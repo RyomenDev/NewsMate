@@ -1,32 +1,68 @@
-# NewsMate
+# 🧠 NewsMate: A RAG-Based News Chatbot
 
-## ✅ What Is Implemented
+## 📌 Objective
 
-**RAG Pipeline**
+NewsMate is an intelligent chatbot that provides real-time, conversational answers based on the latest news articles. It leverages Retrieval-Augmented Generation (RAG) to ground LLM responses in fresh, factual news content sourced from RSS feeds.
 
-- ** ✅ Ingest ~50 news articles:** Done via RSS feeds using fetchNewsFromRSS().
-- ** ✅ Embed with Open Source Model:** Using Xenova/all-MiniLM-L6-v2 (which is open source and similar in quality to Jina).
-- ** ✅ Store in Vector DB:** Embeddings are stored in Qdrant, using the .upsert() API.
-- ** ✅ Retrieve Top-K Passages:** Done via the searchQdrant(query) function (using .search() on Qdrant).
-- ** ✅ Use Gemini API for Final Answer:** The getBotResponse() function uses Gemini to generate answers from retrieved context.
+## 🛠️ Tech Stack
 
-## ✅/🔲 Caching & Performance
+- **Frontend:** React.js with Vite
+- **Backend:** Node.js with Express
+- **Embeddings:** @xenova/transformers (MiniLM)
+- **Vector Store:** Qdrant (Cloud-hosted)
+- **Database/Cache:** Redis (Session management)
+- **Language Model:** Gemini API
+- **Scheduler:** Custom Node.js cron-like job
 
-- **Session-Based Conversation Handling:**
-  🔲 You need to ensure that each user gets a unique session ID. You can do this using: - A UUID generated on the server when a new session starts. - Or Redis (or any in-memory DB) to track sessions using session ID → chat history mappings.
+## 🔍 Key Features & Architecture
 
-- **Caching History in Memory (e.g., Redis):**
-  🔲 If you’re not already doing this, you should: - Store the conversation history (prompt-response pairs) in Redis under the session ID. - Retrieve and optionally use history as context for Gemini or just for UX purposes (e.g., showing previous messages).
+- **RSS Feed Ingestion**
 
-## ✅ Final Checklist
+  - Regularly fetches articles from multiple RSS sources (e.g., NYTimes).
+  - Extracts title, link, and content.
 
-| Feature                          | Status | Suggestion                                            |
-| -------------------------------- | ------ | ----------------------------------------------------- |
-| Article ingestion (RSS)          | ✅     | Done via `fetchNewsFromRSS()`                         |
-| Embedding generation             | ✅     | Done via `xenovaEmbedding.js`                         |
-| Embedding storage                | ✅     | Done using Qdrant                                     |
-| Vector search (top-k)            | ✅     | Implemented in `searchQdrant()`                       |
-| Context-based answer with Gemini | ✅     | Implemented in `getBotResponse()`                     |
-| Session management               | 🔲     | Add `uuid` + store per-session in Redis               |
-| Caching conversation history     | 🔲     | Store `prompt`/`response` in Redis with session key   |
-| Clean modular structure          | ✅     | Using `xenovaEmbedding.js`, `gemini.service.js`, etc. |
+- **Embedding Generation**
+
+  - Uses @xenova/transformers to create dense vector representations of article content.
+  - Ensures semantic similarity can be measured during retrieval.
+
+- **Deduplication**
+
+  - Each article’s link is hashed using SHA-256 and formatted into a UUID-like string.
+  - This unique ID prevents duplicate insertion into the vector store.
+
+- **Vector Storage (Qdrant)**
+
+  - Embeddings are upserted into the news_articles collection.
+  - Qdrant is queried later for semantically similar chunks during a chatbot session.
+
+- **Chatbot (RAG)**
+
+  - User question triggers a semantic search in Qdrant.
+  - Top-k relevant context chunks are injected into the Gemini API prompt.
+  - The model generates context-grounded answers.
+
+- **Session Management**
+  - Redis is used to track ongoing conversations and maintain continuity.
+
+⚠️ Difficulties Faced & Resolutions
+| **Problem** | **Cause** | **Resolution** |
+| ------------------------------------------ | ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| **"Bad Request: Invalid ID" from Qdrant** | Direct use of URLs as point IDs (invalid format) | Introduced hashing (SHA-256) of links into UUID-like strings |
+| **Duplicate Data Despite No Uploads** | Same link repeatedly inserted without proper deduplication logic | Added pre-check using `qdrant.retrieve()` to skip already embedded articles |
+| **ReferenceError: `stats` is not defined** | Misuse of Qdrant collection metadata in `ensureCollectionExists` | Removed incorrect `stats` reference and replaced with proper collection existence check |
+| **Embedding Failures** | Some articles had malformed or insufficient content | Added validation and fallback logic per article to skip bad entries |
+| **Silent Failures / Poor Logging** | Errors weren't specific or granular | Improved error logs and debug messaging for each critical operation (embedding, upsert, fetch) |
+
+## ✅ Outcomes
+
+- ✅ Successfully built a full-stack news chatbot using RAG.
+- ✅ Embedded 50+ articles into Qdrant and enabled semantic search.
+- ✅ Integrated Gemini for high-quality LLM responses.
+- ✅ Achieved auto-updating context through periodic embedding refreshes.
+
+## 📘 Future Improvements
+
+- Add user authentication and persistent chat history.
+- Integrate summarization and source citation.
+- Scale to handle multi-lingual feeds.

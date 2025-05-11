@@ -1,14 +1,14 @@
 # NewsMate
 
-## ✅ What You've Already Implemented
+## ✅ What Is Implemented
 
 **RAG Pipeline**
 
-- **Ingest ~50 news articles:** ✅ Done via RSS feeds using fetchNewsFromRSS().
-- **Embed with Open Source Model:** ✅ Using Xenova/all-MiniLM-L6-v2 (which is open source and similar in quality to Jina).
-- **Store in Vector DB:** ✅ Embeddings are stored in Qdrant, using the .upsert() API.
-- **Retrieve Top-K Passages:** ✅ Done via the searchQdrant(query) function (using .search() on Qdrant).
-- **Use Gemini API for Final Answer:** ✅ The getBotResponse() function uses Gemini to generate answers from retrieved context.
+- ** ✅ Ingest ~50 news articles:** Done via RSS feeds using fetchNewsFromRSS().
+- ** ✅ Embed with Open Source Model:** Using Xenova/all-MiniLM-L6-v2 (which is open source and similar in quality to Jina).
+- ** ✅ Store in Vector DB:** Embeddings are stored in Qdrant, using the .upsert() API.
+- ** ✅ Retrieve Top-K Passages:** Done via the searchQdrant(query) function (using .search() on Qdrant).
+- ** ✅ Use Gemini API for Final Answer:** The getBotResponse() function uses Gemini to generate answers from retrieved context.
 
 ## ✅/🔲 Caching & Performance
 

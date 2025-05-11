@@ -3,6 +3,8 @@ import { connectRedis } from "./src/services/redisClient.js";
 import conf from "./src/conf.js";
 import { generateEmbeddings } from "./src/utils/xenovaEmbedding.js";
 
+import { startEmbeddingScheduler } from "./src/utils/embeddingScheduler.js";
+
 // Set server port from config or fallback to 3000
 const PORT = conf.PORT || 3000;
 
@@ -19,7 +21,8 @@ const startServer = async () => {
   try {
     // Connect to Redis before starting the server
     await connectRedis();
-    await xenova();
+    // await xenova();
+    startEmbeddingScheduler();
 
     // Start the Express server
     app.listen(PORT, () => {

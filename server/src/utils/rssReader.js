@@ -11,8 +11,9 @@ async function fetchNewsFromRSS() {
     link: item.link,
   }));
 
-  console.log("Fetched articles:", articles.length);
+//   console.log("Fetched articles:", articles.length);
   return articles;
 }
 
 export { fetchNewsFromRSS };
+
